@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/line/line-bot-sdk-go/v7/linebot"
-	"log"
 	"net/http"
 	"strings"
 )
@@ -23,6 +22,8 @@ func (app *AppConfig) lineCallback(c *gin.Context) {
 	events, err := app.Bot.ParseRequest(c.Request)
 	if err != nil {
 		// Do something when something bad happened.
+		app.ErrorLog.Println(err)
+		return
 	}
 	for _, event := range events {
 		if event.Type == linebot.EventTypeMessage {
@@ -35,7 +36,7 @@ func (app *AppConfig) lineCallback(c *gin.Context) {
 						reply = "你有說話嗎？"
 					}
 					if _, err = app.Bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(reply)).Do(); err != nil {
-						log.Print(err)
+						app.InfoLog.Println(err)
 					}
 				}
 			}
