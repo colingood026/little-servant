@@ -6,5 +6,5 @@ import (
 
 func (app *AppConfig) router(r *gin.Engine) {
 	r.GET("/health", app.health)
-	r.GET("/callback", app.callback)
+	r.GET("/line/callback", app.lineCallback)
 }
