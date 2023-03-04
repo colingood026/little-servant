@@ -12,6 +12,7 @@ const (
 )
 
 func (app *AppConfig) health(c *gin.Context) {
+	app.InfoLog.Println("hit health...")
 	c.JSON(http.StatusOK, gin.H{
 		"message": "pong",
 		"commit":  Commit,
