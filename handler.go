@@ -20,7 +20,6 @@ func (app *AppConfig) health(c *gin.Context) {
 }
 
 func (app *AppConfig) lineCallback(c *gin.Context) {
-	app.InfoLog.Println("hit lineCallback...")
 	events, err := app.Bot.ParseRequest(c.Request)
 	if err != nil {
 		// Do something when something bad happened.
@@ -33,12 +32,12 @@ func (app *AppConfig) lineCallback(c *gin.Context) {
 			case *linebot.TextMessage:
 				if strings.HasPrefix(message.Text, prefix) {
 					input := strings.Split(message.Text, prefix)[1]
-					reply := "你說的是" + input
+					reply := "你說的是:" + input
 					if input == "" {
 						reply = "你有說話嗎？"
 					}
 					if _, err = app.Bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(reply)).Do(); err != nil {
-						app.InfoLog.Println(err)
+						app.ErrorLog.Println(err)
 					}
 				}
 			}
