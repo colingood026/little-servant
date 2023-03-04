@@ -28,6 +28,7 @@ func (app *AppConfig) lineCallback(c *gin.Context) {
 		return
 	}
 	for _, event := range events {
+		app.InfoLog.Println("event=", event)
 		if event.Type == linebot.EventTypeMessage {
 			switch message := event.Message.(type) {
 			case *linebot.TextMessage:
