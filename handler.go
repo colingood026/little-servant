@@ -19,6 +19,7 @@ func (app *AppConfig) health(c *gin.Context) {
 }
 
 func (app *AppConfig) lineCallback(c *gin.Context) {
+	app.InfoLog.Println("hit lineCallback...")
 	events, err := app.Bot.ParseRequest(c.Request)
 	if err != nil {
 		// Do something when something bad happened.
