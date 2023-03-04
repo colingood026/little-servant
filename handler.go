@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/line/line-bot-sdk-go/v7/linebot"
 	"net/http"
@@ -27,9 +28,11 @@ func (app *AppConfig) lineCallback(c *gin.Context) {
 		return
 	}
 	for _, event := range events {
+		app.InfoLog.Printf(fmt.Sprintf("event.source=%v", event.Source))
 		if event.Type == linebot.EventTypeMessage {
 			switch message := event.Message.(type) {
 			case *linebot.TextMessage:
+				app.InfoLog.Printf(fmt.Sprintf("event.source=%v, message=%s", event.Source, message.Text))
 				if strings.HasPrefix(message.Text, prefix) {
 					input := strings.Split(message.Text, prefix)[1]
 					reply := "你有說話嗎？"
