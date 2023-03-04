@@ -19,6 +19,12 @@ func (app *AppConfig) health(c *gin.Context) {
 	})
 }
 
+func (app *AppConfig) lineWebhook(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"message": "ok",
+	})
+}
+
 func (app *AppConfig) lineCallback(c *gin.Context) {
 	events, err := app.Bot.ParseRequest(c.Request)
 	if err != nil {

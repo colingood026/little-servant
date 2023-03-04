@@ -6,5 +6,7 @@ import (
 
 func (app *AppConfig) router(r *gin.Engine) {
 	r.GET("/health", app.health)
-	r.GET("/line/callback", app.lineCallback)
+	r.POST("/line/callback", app.lineCallback)
+	r.POST("/line/webhook", app.lineWebhook)
+
 }
