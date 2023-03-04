@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/line/line-bot-sdk-go/v7/linebot"
 	"net/http"
@@ -28,7 +29,7 @@ func (app *AppConfig) lineCallback(c *gin.Context) {
 		return
 	}
 	for _, event := range events {
-		app.InfoLog.Println("event=", event)
+		app.InfoLog.Println(fmt.Sprintf("event=%v", event))
 		if event.Type == linebot.EventTypeMessage {
 			switch message := event.Message.(type) {
 			case *linebot.TextMessage:
