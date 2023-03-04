@@ -8,11 +8,13 @@ import (
 
 type AppConfig struct {
 	Bot      *linebot.Client
+	OpenAI   *OpenAI
 	InfoLog  *log.Logger
 	ErrorLog *log.Logger
 }
 
 func NewAppConfig() AppConfig {
+	// line bot
 	cs, ok := os.LookupEnv("channelSecret")
 	if !ok || cs == "" {
 		log.Fatal("can not get channelSecret")
@@ -21,18 +23,24 @@ func NewAppConfig() AppConfig {
 	if !ok || cat == "" {
 		log.Fatal("can not get channelAccessToken")
 	}
-	log.Printf("channelSecret %s, channelAccessToken%s, initializing line bot...\n", cs, cat)
+	log.Println("initializing line bot...")
 	bot, err := linebot.New(cs, cat)
 	if err != nil {
 		log.Fatal("initial line bot error:", err)
 	}
 	log.Println("initialized line bot")
-	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
-	errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+	// open api
+	openApiKey, ok := os.LookupEnv("openApiKey")
+	if !ok || openApiKey == "" {
+		log.Fatal("can not get openApiKey")
+	}
+	openAI := NewOpenAI(openApiKey)
+	// initial app config
 	app := AppConfig{
 		Bot:      bot,
-		InfoLog:  infoLog,
-		ErrorLog: errorLog,
+		OpenAI:   openAI,
+		InfoLog:  log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime),
+		ErrorLog: log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 	}
 	return app
 }

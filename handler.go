@@ -32,9 +32,13 @@ func (app *AppConfig) lineCallback(c *gin.Context) {
 			case *linebot.TextMessage:
 				if strings.HasPrefix(message.Text, prefix) {
 					input := strings.Split(message.Text, prefix)[1]
-					reply := "你說的是:" + input
-					if input == "" {
-						reply = "你有說話嗎？"
+					reply := "你有說話嗎？"
+					if input != "" {
+						reply, err = app.OpenAI.ChatWithChatGPT(input)
+						if err != nil {
+							app.ErrorLog.Println(err)
+							reply = "OpenAI 發生錯誤了：" + err.Error()
+						}
 					}
 					if _, err = app.Bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(reply)).Do(); err != nil {
 						app.ErrorLog.Println(err)
