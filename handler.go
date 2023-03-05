@@ -11,6 +11,7 @@ import (
 const (
 	prefix             = "小僕人 "
 	imageRequestPrefix = "抽圖 "
+	helpPrefix         = "--help"
 )
 
 func (app *AppConfig) health(c *gin.Context) {
@@ -38,9 +39,16 @@ func (app *AppConfig) lineCallback(c *gin.Context) {
 					input := strings.Split(message.Text, prefix)[1]
 					reply := "你有說話嗎？"
 					if input != "" {
-						// 找圖片
-						// 小僕人 抽圖 白色貓咪
-						if strings.HasPrefix(input, imageRequestPrefix) {
+						if strings.HasPrefix(input, helpPrefix) {
+							// 功能介紹
+							// 小僕人 --help
+							reply = "1.想產生圖片請輸入：小僕人 抽圖 白色貓咪\n 2.想問問題請輸入：小僕人 請列出五間餐廳"
+							if _, err = app.Bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(reply)).Do(); err != nil {
+								app.ErrorLog.Println(err)
+							}
+						} else if strings.HasPrefix(input, imageRequestPrefix) {
+							// 找圖片
+							// 小僕人 抽圖 白色貓咪
 							imageDesc := strings.Split(input, imageRequestPrefix)[1]
 							reply, err = app.OpenAI.GetImage(imageDesc)
 							if err != nil {
