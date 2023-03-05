@@ -35,3 +35,16 @@ func (ct *OpenAI) ChatWithChatGPT(question string) (string, error) {
 
 	return resp.Choices[0].Message.Content, nil
 }
+
+func (ct *OpenAI) GetImage(desc string) (string, error) {
+
+	resp, err := ct.OpenAI.CreateImage(context.Background(), openai.ImageRequest{
+		Prompt: desc,
+		N:      1,
+		Size:   "512x512",
+	})
+	if err != nil {
+		return "", err
+	}
+	return resp.Data[0].URL, nil
+}

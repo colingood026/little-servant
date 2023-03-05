@@ -9,7 +9,8 @@ import (
 )
 
 const (
-	prefix = "小僕人 "
+	prefix             = "小僕人 "
+	imageRequestPrefix = "抽圖 "
 )
 
 func (app *AppConfig) health(c *gin.Context) {
@@ -37,7 +38,16 @@ func (app *AppConfig) lineCallback(c *gin.Context) {
 					input := strings.Split(message.Text, prefix)[1]
 					reply := "你有說話嗎？"
 					if input != "" {
-						reply, err = app.OpenAI.ChatWithChatGPT(input)
+						// 找圖片
+						// 小僕人 抽圖 白色貓咪
+						if strings.HasPrefix(input, imageRequestPrefix) {
+							imageDesc := strings.Split(input, imageRequestPrefix)[1]
+							reply, err = app.OpenAI.GetImage(imageDesc)
+						} else {
+							// 問問題
+							// 小僕人 請列出五間餐廳
+							reply, err = app.OpenAI.ChatWithChatGPT(input)
+						}
 						if err != nil {
 							app.ErrorLog.Println(err)
 							reply = "OpenAI 發生錯誤了：" + err.Error()
