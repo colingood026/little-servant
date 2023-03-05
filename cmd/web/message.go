@@ -28,10 +28,14 @@ func InitMyMessage(msg string, isSingleUser bool) MyMessage {
 		Type:      InvalidType,
 	}
 	input := myMsg.OriginMsg
-	if !isSingleUser && strings.HasPrefix(msg, prefix) {
-		input = strings.Split(msg, prefix)[1]
+	if !isSingleUser {
+		if strings.HasPrefix(msg, prefix) {
+			input = strings.Split(msg, prefix)[1]
+			setMsg(input, &myMsg)
+		}
+	} else {
+		setMsg(input, &myMsg)
 	}
-	setMsg(input, &myMsg)
 	return myMsg
 }
 
