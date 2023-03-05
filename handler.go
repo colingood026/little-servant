@@ -46,9 +46,13 @@ func (app *AppConfig) lineCallback(c *gin.Context) {
 							if err != nil {
 								app.ErrorLog.Println(err)
 								reply = "OpenAI 發生錯誤了：" + err.Error()
-							}
-							if _, err = app.Bot.ReplyMessage(event.ReplyToken, linebot.NewImageMessage(reply, reply)).Do(); err != nil {
-								app.ErrorLog.Println(err)
+								if _, err = app.Bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(reply)).Do(); err != nil {
+									app.ErrorLog.Println(err)
+								}
+							} else {
+								if _, err = app.Bot.ReplyMessage(event.ReplyToken, linebot.NewImageMessage(reply, reply)).Do(); err != nil {
+									app.ErrorLog.Println(err)
+								}
 							}
 						} else {
 							// 問問題
