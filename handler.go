@@ -43,18 +43,25 @@ func (app *AppConfig) lineCallback(c *gin.Context) {
 						if strings.HasPrefix(input, imageRequestPrefix) {
 							imageDesc := strings.Split(input, imageRequestPrefix)[1]
 							reply, err = app.OpenAI.GetImage(imageDesc)
+							if err != nil {
+								app.ErrorLog.Println(err)
+								reply = "OpenAI 發生錯誤了：" + err.Error()
+							}
+							if _, err = app.Bot.ReplyMessage(event.ReplyToken, linebot.NewImageMessage(reply, reply)).Do(); err != nil {
+								app.ErrorLog.Println(err)
+							}
 						} else {
 							// 問問題
 							// 小僕人 請列出五間餐廳
 							reply, err = app.OpenAI.ChatWithChatGPT(input)
+							if err != nil {
+								app.ErrorLog.Println(err)
+								reply = "OpenAI 發生錯誤了：" + err.Error()
+							}
+							if _, err = app.Bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(reply)).Do(); err != nil {
+								app.ErrorLog.Println(err)
+							}
 						}
-						if err != nil {
-							app.ErrorLog.Println(err)
-							reply = "OpenAI 發生錯誤了：" + err.Error()
-						}
-					}
-					if _, err = app.Bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(reply)).Do(); err != nil {
-						app.ErrorLog.Println(err)
 					}
 				}
 			}
