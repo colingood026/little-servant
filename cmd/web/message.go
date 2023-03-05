@@ -22,32 +22,37 @@ type MyMessage struct {
 	Reply     string
 }
 
-func InitMyMessage(msg string) MyMessage {
+func InitMyMessage(msg string, isSingleUser bool) MyMessage {
 	myMsg := MyMessage{
 		OriginMsg: msg,
 		Type:      InvalidType,
 	}
-	if strings.HasPrefix(msg, prefix) {
-		input := strings.Split(msg, prefix)[1]
-		if input != "" {
-			if strings.HasPrefix(input, helpPrefix) {
-				// 功能介紹
-				// 小僕人 --help
-				myMsg.Type = InfoIntroType
-			} else if strings.HasPrefix(input, imageRequestPrefix) {
-				// 找圖片
-				// 小僕人 抽圖 白色貓咪
-				myMsg.Type = ImageType
-				myMsg.Input = strings.Split(input, imageRequestPrefix)[1]
-			} else {
-				// 問問題
-				// 小僕人 請列出五間餐廳
-				myMsg.Type = QuestionType
-				myMsg.Input = input
-			}
-		} else {
-			myMsg.Type = EmptyType
-		}
+	input := myMsg.OriginMsg
+	if !isSingleUser && strings.HasPrefix(msg, prefix) {
+		input = strings.Split(msg, prefix)[1]
 	}
+	setMsg(input, &myMsg)
 	return myMsg
+}
+
+func setMsg(input string, myMsg *MyMessage) {
+	if input != "" {
+		if strings.HasPrefix(input, helpPrefix) {
+			// 功能介紹
+			// 小僕人 --help
+			myMsg.Type = InfoIntroType
+		} else if strings.HasPrefix(input, imageRequestPrefix) {
+			// 找圖片
+			// 小僕人 抽圖 白色貓咪
+			myMsg.Type = ImageType
+			myMsg.Input = strings.Split(input, imageRequestPrefix)[1]
+		} else {
+			// 問問題
+			// 小僕人 請列出五間餐廳
+			myMsg.Type = QuestionType
+			myMsg.Input = input
+		}
+	} else {
+		myMsg.Type = EmptyType
+	}
 }

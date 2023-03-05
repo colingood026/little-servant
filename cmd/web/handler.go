@@ -58,7 +58,7 @@ func (app *AppConfig) GenerateMyMsg(event *linebot.Event) (MyMessage, error) {
 		app.InfoLog.Printf(fmt.Sprintf("event.source=%v, message=%s", event.Source, message.Text))
 		// 產生訊息
 		reply := "你有說話嗎？"
-		myMsg = InitMyMessage(message.Text)
+		myMsg = InitMyMessage(message.Text, event.Source.Type == linebot.EventSourceTypeUser)
 		switch myMsg.Type {
 		case ImageType:
 			reply, err = app.OpenAI.GetImage(myMsg.Input)
