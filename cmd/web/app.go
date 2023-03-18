@@ -41,16 +41,16 @@ func getEnvKey() (EnvKey, error) {
 	var env EnvKey
 	cs, ok := os.LookupEnv(KeyChannelSecret)
 	if !ok || cs == "" {
-		return env, errors.New("can not get channelSecret")
+		return env, errors.New("can not get env:" + KeyChannelSecret)
 	}
 	cat, ok := os.LookupEnv(keyChannelAccessToken)
 	if !ok || cat == "" {
-		return env, errors.New("can not get channelAccessToken")
+		return env, errors.New("can not get env:" + keyChannelAccessToken)
 	}
 	env.LineBot = LineBotConfig{ChannelSecret: cs, ChannelAccessToken: cat}
 	openApiKey, ok := os.LookupEnv(KeyOpenApi)
 	if !ok || openApiKey == "" {
-		return env, errors.New("can not get openApiKey")
+		return env, errors.New("can not get env:" + KeyOpenApi)
 	}
 	env.OpenAI = OpenAiConfig{ApiKey: openApiKey}
 	return env, nil
