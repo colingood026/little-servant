@@ -31,18 +31,24 @@ type EnvKey struct {
 	OpenAI  OpenAiConfig
 }
 
+const (
+	KeyChannelSecret      = "CHANNEL_SECRET"
+	keyChannelAccessToken = "CHANNEL_ACCESS_TOKEN"
+	KeyOpenApi            = "OPEN_API_KEY"
+)
+
 func getEnvKey() (EnvKey, error) {
 	var env EnvKey
-	cs, ok := os.LookupEnv("channelSecret")
+	cs, ok := os.LookupEnv(KeyChannelSecret)
 	if !ok || cs == "" {
 		return env, errors.New("can not get channelSecret")
 	}
-	cat, ok := os.LookupEnv("channelAccessToken")
+	cat, ok := os.LookupEnv(keyChannelAccessToken)
 	if !ok || cat == "" {
 		return env, errors.New("can not get channelAccessToken")
 	}
 	env.LineBot = LineBotConfig{ChannelSecret: cs, ChannelAccessToken: cat}
-	openApiKey, ok := os.LookupEnv("openApiKey")
+	openApiKey, ok := os.LookupEnv(KeyOpenApi)
 	if !ok || openApiKey == "" {
 		return env, errors.New("can not get openApiKey")
 	}
