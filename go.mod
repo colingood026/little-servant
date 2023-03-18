@@ -7,6 +7,8 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.0.0-rc.1
 	github.com/lestrrat-go/jwx v1.2.25
 	github.com/line/line-bot-sdk-go/v7 v7.19.0
+	github.com/sashabaranov/go-openai v1.5.2
+	golang.org/x/net v0.7.0
 )
 
 require (
@@ -31,12 +33,10 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.7 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/sashabaranov/go-openai v1.4.1 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.10 // indirect
 	golang.org/x/arch v0.2.0 // indirect
 	golang.org/x/crypto v0.6.0 // indirect
-	golang.org/x/net v0.7.0 // indirect
 	golang.org/x/sys v0.5.0 // indirect
 	golang.org/x/text v0.7.0 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
