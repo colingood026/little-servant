@@ -19,7 +19,7 @@ func (ct *OpenAI) ChatWithChatGPT(question string) (string, error) {
 	resp, err := ct.OpenAI.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
-			Model: openai.GPT432K,
+			Model: openai.GPT3Dot5Turbo0301,
 			Messages: []openai.ChatCompletionMessage{
 				{
 					Role:    openai.ChatMessageRoleUser,
