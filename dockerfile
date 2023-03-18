@@ -7,8 +7,6 @@ WORKDIR /app
 # Copy the application files into the working directory
 COPY . /app
 
-RUN cd /app
-
 # Build the application
 RUN go build -o little-servant ./cmd/web
 
