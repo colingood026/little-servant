@@ -62,11 +62,11 @@ func (app *AppConfig) telegramWebhook(c *gin.Context) {
 		c.JSON(200, "webhook secret is invalid")
 		return
 	}
-	var up Update
+	var up tgbotapi.Update
 	err := c.Bind(&up)
 	if err != nil {
 		app.ErrorLog.Println(err)
-		newMsg := tgbotapi.NewMessage(up.Message.From.Id, "OpenAI 發生錯誤了："+err.Error())
+		newMsg := tgbotapi.NewMessage(up.Message.Chat.ID, "OpenAI 發生錯誤了："+err.Error())
 		if _, err = app.TelegramBot.Send(newMsg); err != nil {
 			app.ErrorLog.Println(err)
 		}
@@ -75,58 +75,24 @@ func (app *AppConfig) telegramWebhook(c *gin.Context) {
 	}
 	app.InfoLog.Println(fmt.Sprintf("request body=%#v\n", up))
 	// 產生訊息
-	myMsg, err := app.GenerateMsg(up.Message.Text, up.Message.Chat.ChatType == ChatTypePrivate)
+	myMsg, err := app.GenerateMsg(up.Message.Text, up.Message.Chat.IsPrivate())
 	// 準備發送訊息
 	if myMsg.Type != InvalidType {
+		var newMsg tgbotapi.Chattable
 		if err != nil {
 			app.ErrorLog.Println(err)
 			myMsg.Reply = "OpenAI 發生錯誤了：" + err.Error()
-			newMsg := tgbotapi.NewMessage(up.Message.Chat.Id, myMsg.Reply)
-			if _, err = app.TelegramBot.Send(newMsg); err != nil {
-				app.ErrorLog.Println(err)
-			}
+			newMsg = tgbotapi.NewMessage(up.Message.Chat.ID, myMsg.Reply)
 		} else {
 			if myMsg.Type == ImageType {
-				newMsg := tgbotapi.NewPhotoShare(up.Message.Chat.Id, myMsg.Reply)
-				if _, err = app.TelegramBot.Send(newMsg); err != nil {
-					app.ErrorLog.Println(err)
-				}
+				newMsg = tgbotapi.NewPhotoShare(up.Message.Chat.ID, myMsg.Reply)
 			} else {
-				newMsg := tgbotapi.NewMessage(up.Message.Chat.Id, myMsg.Reply)
-				if _, err = app.TelegramBot.Send(newMsg); err != nil {
-					app.ErrorLog.Println(err)
-				}
+				newMsg = tgbotapi.NewMessage(up.Message.Chat.ID, myMsg.Reply)
 			}
+		}
+		if _, err = app.TelegramBot.Send(newMsg); err != nil {
+			app.ErrorLog.Println(err)
 		}
 	}
 	c.JSON(200, "success")
-}
-
-func (app *AppConfig) GenerateMyMsgWithLineBot(event *linebot.Event) (MyMessage, error) {
-	var err error
-	var myMsg MyMessage
-	switch message := event.Message.(type) {
-	case *linebot.TextMessage:
-		app.InfoLog.Printf(fmt.Sprintf("event.source=%#v, message=%s", event.Source, message.Text))
-		myMsg, err = app.GenerateMsg(message.Text, event.Source.Type == linebot.EventSourceTypeUser)
-	}
-	app.InfoLog.Printf(fmt.Sprintf("myMsg=%#v", myMsg))
-	return myMsg, err
-}
-
-func (app *AppConfig) GenerateMsg(txt string, isSingleUser bool) (MyMessage, error) {
-	var err error
-	// 產生訊息
-	reply := "你有說話嗎？"
-	myMsg := InitMyMessage(txt, isSingleUser)
-	switch myMsg.Type {
-	case ImageType:
-		reply, err = app.OpenAI.GetImage(myMsg.Input)
-	case InfoIntroType:
-		reply = "1.想產生圖片請輸入：小僕人 抽圖 白色貓咪\n 2.想問問題請輸入：小僕人 請列出五間餐廳"
-	case QuestionType:
-		reply, err = app.OpenAI.ChatWithChatGPT(myMsg.Input)
-	}
-	myMsg.Reply = reply
-	return myMsg, err
 }
