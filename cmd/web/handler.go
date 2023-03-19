@@ -87,10 +87,7 @@ func (app *AppConfig) telegramWebhook(c *gin.Context) {
 			}
 		} else {
 			if myMsg.Type == ImageType {
-				//if _, err = app.LineBot.ReplyMessage(event.ReplyToken, linebot.NewImageMessage(myMsg.Reply, myMsg.Reply)).Do(); err != nil {
-				//	app.ErrorLog.Println(err)
-				//}
-				newMsg := tgbotapi.NewMessage(up.Message.Chat.Id, "尚未支援抽圖...")
+				newMsg := tgbotapi.NewPhotoShare(up.Message.Chat.Id, myMsg.Reply)
 				if _, err = app.TelegramBot.Send(newMsg); err != nil {
 					app.ErrorLog.Println(err)
 				}
