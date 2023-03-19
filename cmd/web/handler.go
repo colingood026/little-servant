@@ -56,15 +56,17 @@ func (app *AppConfig) telegramWebhook(c *gin.Context) {
 	webhookToken := header.Get("X-Telegram-Bot-Api-Secret-Token")
 	if app.Env.TelegramBot.WebhookToken != webhookToken {
 		app.ErrorLog.Printf("received webhook secret token %s is not correct\n", webhookToken)
+		c.JSON(200, "webhook secret is invalid")
 		return
 	}
 	var m map[string]interface{}
 	err := c.Bind(&m)
 	if err != nil {
 		app.ErrorLog.Println(err)
+		c.JSON(200, err)
 		return
 	}
-	fmt.Printf("%v\n", m)
+	app.InfoLog.Println(fmt.Sprintf("%v\n", m))
 	c.JSON(200, "success")
 }
 
