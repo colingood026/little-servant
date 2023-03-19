@@ -24,7 +24,7 @@ func (app *AppConfig) lineCallback(c *gin.Context) {
 		return
 	}
 	for _, event := range events {
-		app.InfoLog.Printf(fmt.Sprintf("event.source=%v", event.Source))
+		app.InfoLog.Printf(fmt.Sprintf("event.source=%#v", event.Source))
 		if event.Type == linebot.EventTypeMessage {
 			myMsg, err := app.GenerateMyMsg(event)
 			// 準備發送訊息
@@ -53,7 +53,7 @@ func (app *AppConfig) lineCallback(c *gin.Context) {
 
 func (app *AppConfig) telegramWebhook(c *gin.Context) {
 	header := c.Request.Header
-	app.InfoLog.Println(fmt.Sprintf("received header:%v", header))
+	app.InfoLog.Println(fmt.Sprintf("received header:%#v", header))
 	webhookToken := header.Get("X-Telegram-Bot-Api-Secret-Token")
 	if app.Env.TelegramBot.WebhookToken != webhookToken {
 		app.ErrorLog.Printf("received webhook secret token %s is not correct\n", webhookToken)
@@ -71,7 +71,7 @@ func (app *AppConfig) telegramWebhook(c *gin.Context) {
 		c.JSON(200, err)
 		return
 	}
-	app.InfoLog.Println(fmt.Sprintf("request body=%v\n", up))
+	app.InfoLog.Println(fmt.Sprintf("request body=%#v\n", up))
 	// 產生訊息
 	reply := "你有說話嗎？"
 	myMsg := InitMyMessage(up.Message.Text, true)
@@ -98,7 +98,10 @@ func (app *AppConfig) telegramWebhook(c *gin.Context) {
 				//if _, err = app.LineBot.ReplyMessage(event.ReplyToken, linebot.NewImageMessage(myMsg.Reply, myMsg.Reply)).Do(); err != nil {
 				//	app.ErrorLog.Println(err)
 				//}
-				app.InfoLog.Println("尚未支援抽圖...")
+				newMsg := tgbotapi.NewMessage(up.Message.From.Id, "尚未支援抽圖...")
+				if _, err = app.TelegramBot.Send(newMsg); err != nil {
+					app.ErrorLog.Println(err)
+				}
 			} else {
 				newMsg := tgbotapi.NewMessage(up.Message.From.Id, myMsg.Reply)
 				if _, err = app.TelegramBot.Send(newMsg); err != nil {
@@ -115,7 +118,7 @@ func (app *AppConfig) GenerateMyMsg(event *linebot.Event) (MyMessage, error) {
 	var myMsg MyMessage
 	switch message := event.Message.(type) {
 	case *linebot.TextMessage:
-		app.InfoLog.Printf(fmt.Sprintf("event.source=%v, message=%s", event.Source, message.Text))
+		app.InfoLog.Printf(fmt.Sprintf("event.source=%#v, message=%s", event.Source, message.Text))
 		// 產生訊息
 		reply := "你有說話嗎？"
 		myMsg = InitMyMessage(message.Text, event.Source.Type == linebot.EventSourceTypeUser)
@@ -129,6 +132,6 @@ func (app *AppConfig) GenerateMyMsg(event *linebot.Event) (MyMessage, error) {
 		}
 		myMsg.Reply = reply
 	}
-	app.InfoLog.Printf(fmt.Sprintf("myMsg=%v", myMsg))
+	app.InfoLog.Printf(fmt.Sprintf("myMsg=%#v", myMsg))
 	return myMsg, err
 }
