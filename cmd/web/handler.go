@@ -6,7 +6,6 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/line/line-bot-sdk-go/v7/linebot"
 	"net/http"
-	"time"
 )
 
 func (app *AppConfig) health(c *gin.Context) {
@@ -65,14 +64,49 @@ func (app *AppConfig) telegramWebhook(c *gin.Context) {
 	err := c.Bind(&up)
 	if err != nil {
 		app.ErrorLog.Println(err)
+		newMsg := tgbotapi.NewMessage(up.Message.From.Id, "OpenAI 發生錯誤了："+err.Error())
+		if _, err = app.TelegramBot.Send(newMsg); err != nil {
+			app.ErrorLog.Println(err)
+		}
 		c.JSON(200, err)
 		return
 	}
-	app.InfoLog.Println(fmt.Sprintf("%v\n", up))
-	msg := fmt.Sprintf("%s_%d", "hello", time.Now().Unix())
-	app.InfoLog.Println("response:", msg)
-	newMsg := tgbotapi.NewMessage(up.Message.From.Id, msg)
-	app.TelegramBot.Send(newMsg)
+	app.InfoLog.Println(fmt.Sprintf("request body=%v\n", up))
+	// 產生訊息
+	reply := "你有說話嗎？"
+	myMsg := InitMyMessage(up.Message.Text, true)
+	switch myMsg.Type {
+	case ImageType:
+		reply, err = app.OpenAI.GetImage(myMsg.Input)
+	case InfoIntroType:
+		reply = "1.想產生圖片請輸入：小僕人 抽圖 白色貓咪\n 2.想問問題請輸入：小僕人 請列出五間餐廳"
+	case QuestionType:
+		reply, err = app.OpenAI.ChatWithChatGPT(myMsg.Input)
+	}
+	myMsg.Reply = reply
+	// 準備發送訊息
+	if myMsg.Type != InvalidType {
+		if err != nil {
+			app.ErrorLog.Println(err)
+			myMsg.Reply = "OpenAI 發生錯誤了：" + err.Error()
+			newMsg := tgbotapi.NewMessage(up.Message.From.Id, myMsg.Reply)
+			if _, err = app.TelegramBot.Send(newMsg); err != nil {
+				app.ErrorLog.Println(err)
+			}
+		} else {
+			if myMsg.Type == ImageType {
+				//if _, err = app.LineBot.ReplyMessage(event.ReplyToken, linebot.NewImageMessage(myMsg.Reply, myMsg.Reply)).Do(); err != nil {
+				//	app.ErrorLog.Println(err)
+				//}
+				app.InfoLog.Println("尚未支援抽圖...")
+			} else {
+				newMsg := tgbotapi.NewMessage(up.Message.From.Id, myMsg.Reply)
+				if _, err = app.TelegramBot.Send(newMsg); err != nil {
+					app.ErrorLog.Println(err)
+				}
+			}
+		}
+	}
 	c.JSON(200, "success")
 }
 
