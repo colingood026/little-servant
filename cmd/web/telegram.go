@@ -17,7 +17,7 @@ type TgMessage struct {
 type TgChat struct {
 	Id        int64  `json:"id"`
 	FirstName string `json:"first_name"`
-	ChatType  string `json:"type"`
+	ChatType  string `json:"type"` // private,group,supergroup,supergroup
 	UserName  string `json:"username"`
 }
 
@@ -27,3 +27,10 @@ type TgFrom struct {
 	UserName  string `json:"username"`
 	IsBot     bool   `json:"is_bot"`
 }
+
+const (
+	ChatTypePrivate    = "private"
+	ChatTypeGroup      = "group"
+	ChatTypeSuperGroup = "supergroup"
+	ChatTypeChannel    = "supergroup"
+)
