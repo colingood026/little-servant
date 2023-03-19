@@ -50,6 +50,24 @@ func (app *AppConfig) lineCallback(c *gin.Context) {
 	}
 }
 
+func (app *AppConfig) telegramWebhook(c *gin.Context) {
+	header := c.Request.Header
+	app.InfoLog.Println(fmt.Sprintf("received header:%v", header))
+	webhookToken := header.Get("X-Telegram-Bot-Api-Secret-Token")
+	if app.Env.TelegramBot.WebhookToken != webhookToken {
+		app.ErrorLog.Printf("received webhook secret token %s is not correct\n", webhookToken)
+		return
+	}
+	var m map[string]interface{}
+	err := c.Bind(&m)
+	if err != nil {
+		app.ErrorLog.Println(err)
+		return
+	}
+	fmt.Printf("%v\n", m)
+	c.JSON(200, "success")
+}
+
 func (app *AppConfig) GenerateMyMsg(event *linebot.Event) (MyMessage, error) {
 	var err error
 	var myMsg MyMessage
