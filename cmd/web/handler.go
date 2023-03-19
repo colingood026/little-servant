@@ -89,7 +89,7 @@ func (app *AppConfig) telegramWebhook(c *gin.Context) {
 		if err != nil {
 			app.ErrorLog.Println(err)
 			myMsg.Reply = "OpenAI 發生錯誤了：" + err.Error()
-			newMsg := tgbotapi.NewMessage(up.Message.From.Id, myMsg.Reply)
+			newMsg := tgbotapi.NewMessage(up.Message.Chat.Id, myMsg.Reply)
 			if _, err = app.TelegramBot.Send(newMsg); err != nil {
 				app.ErrorLog.Println(err)
 			}
@@ -98,12 +98,12 @@ func (app *AppConfig) telegramWebhook(c *gin.Context) {
 				//if _, err = app.LineBot.ReplyMessage(event.ReplyToken, linebot.NewImageMessage(myMsg.Reply, myMsg.Reply)).Do(); err != nil {
 				//	app.ErrorLog.Println(err)
 				//}
-				newMsg := tgbotapi.NewMessage(up.Message.From.Id, "尚未支援抽圖...")
+				newMsg := tgbotapi.NewMessage(up.Message.Chat.Id, "尚未支援抽圖...")
 				if _, err = app.TelegramBot.Send(newMsg); err != nil {
 					app.ErrorLog.Println(err)
 				}
 			} else {
-				newMsg := tgbotapi.NewMessage(up.Message.From.Id, myMsg.Reply)
+				newMsg := tgbotapi.NewMessage(up.Message.Chat.Id, myMsg.Reply)
 				if _, err = app.TelegramBot.Send(newMsg); err != nil {
 					app.ErrorLog.Println(err)
 				}
