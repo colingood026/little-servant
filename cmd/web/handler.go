@@ -3,8 +3,10 @@ package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/line/line-bot-sdk-go/v7/linebot"
 	"net/http"
+	"time"
 )
 
 func (app *AppConfig) health(c *gin.Context) {
@@ -59,14 +61,18 @@ func (app *AppConfig) telegramWebhook(c *gin.Context) {
 		c.JSON(200, "webhook secret is invalid")
 		return
 	}
-	var m map[string]interface{}
-	err := c.Bind(&m)
+	var up Update
+	err := c.Bind(&up)
 	if err != nil {
 		app.ErrorLog.Println(err)
 		c.JSON(200, err)
 		return
 	}
-	app.InfoLog.Println(fmt.Sprintf("%v\n", m))
+	app.InfoLog.Println(fmt.Sprintf("%v\n", up))
+	msg := fmt.Sprintf("%s_%d", "hello", time.Now().Unix())
+	app.InfoLog.Println("response:", msg)
+	newMsg := tgbotapi.NewMessage(up.Message.From.Id, msg)
+	app.TelegramBot.Send(newMsg)
 	c.JSON(200, "success")
 }
 
